@@ -10,6 +10,7 @@ import styled from 'styled-components';
 
 import OnboardingProfileCard from './onboarding-modal/OnboardingProfileCard';
 import CollectivePickerAsync from './CollectivePickerAsync';
+import { BackButton, messages } from './create-collective/CreateCollectiveForm';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import MessageBox from './MessageBox';
@@ -22,15 +23,10 @@ import StyledInputGroup from './StyledInputGroup';
 import StyledLink from './StyledLink';
 import StyledTextarea from './StyledTextarea';
 import { H1, H4, P } from './Text';
+import { withUser } from './UserProvider';
 
-const BackButton = styled(StyledButton)`
-  color: ${themeGet('colors.black.600')};
-  font-size: 14px;
-`;
-
-const messages = defineMessages({
+const orgMessages = defineMessages({
   nameLabel: { id: 'createOrg.form.nameLabel', defaultMessage: "What's the name of your organization?" },
-  slugLabel: { id: 'createOrg.form.slugLabel', defaultMessage: 'What URL would you like?' },
   websiteLabel: { id: 'createOrg.form.webstiteLabel', defaultMessage: "What's your Organization's website" },
   suggestedLabel: { id: 'createOrg.form.suggestedLabel', defaultMessage: 'Suggested' },
   descriptionLabel: {
@@ -41,21 +37,13 @@ const messages = defineMessages({
     id: 'createOrg.form.descriptionHint',
     defaultMessage: 'Write a short description of your Organization (150 characters max)',
   },
-  descriptionPlaceholder: {
-    id: 'create.org.placeholder',
-    defaultMessage: 'Making the world a better place',
-  },
-  errorName: {
-    id: 'createOrg.form.error.name',
-    defaultMessage: 'Please use fewer than 50 characters',
-  },
-  errorDescription: {
-    id: 'createOrg.form.error.description',
-    defaultMessage: 'Please use fewer than 160 characters',
+  errorSlugHyphen: {
+    id: 'createOrg.form.error.slug.hyphen',
+    defaultMessage: 'Organization slug can not start nor end with hyphen',
   },
   errorWebsite: {
     id: 'createOrg.form.error.website',
-    defaultMessage: 'Enter valid website format',
+    defaultMessage: 'Enter valid website format www.test.com or test.org',
   },
 });
 
@@ -69,8 +57,8 @@ const placeholders = {
 
 function CreateOrganizationForm(props) {
   const { intl, error, loading, LoggedInUser, onSubmit, updateAdmins } = props;
-  const [authorization, setAuthorization] = useState('');
-  const [admins, setAdmins] = useState([]);
+  const [authorization, setAuthorization] = useState(false);
+  const [admins, setAdmins] = useState([{ role: 'ADMIN', member: LoggedInUser.collective }]);
   const initialValues = {
     name: '',
     slug: '',
@@ -84,8 +72,19 @@ function CreateOrganizationForm(props) {
     if (values.name.length > 50) {
       errors.name = intl.formatMessage(messages.errorName);
     }
+    if (values.slug.length > 30) {
+      errors.slug = intl.formatMessage(messages.errorSlug);
+    }
+    if (values.slug !== trim(values.slug, '-')) {
+      errors.slug = intl.formatMessage(orgMessages.errorSlugHyphen);
+    }
     if (values.description.length > 150) {
       errors.description = intl.formatMessage(messages.errorDescription);
+    }
+    const regexExp = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+
+    if (!values.website.match(new RegExp(regexExp)) || values.website.startsWith('http')) {
+      errors.website = intl.formatMessage(orgMessages.errorWebsite);
     }
     return errors;
   };
@@ -108,27 +107,25 @@ function CreateOrganizationForm(props) {
   }, [admins]);
 
   return (
-    <Flex flexDirection="column" m={[3, 0]}>
-      <Flex flexDirection="column" m={[3, 0]}>
-        <Flex flexDirection="column" my={[2, 4]}>
-          <Box textAlign="left" minHeight="32px">
-            <BackButton asLink onClick={() => window && window.history.back()}>
-              ←&nbsp;
-              <FormattedMessage id="Back" defaultMessage="Back" />
-            </BackButton>
-          </Box>
-          <Box mb={[2, 3]}>
-            <H1
-              fontSize={['20px', '32px']}
-              lineHeight={['24px', '36px']}
-              fontWeight="bold"
-              textAlign="center"
-              color="black.900"
-            >
-              <FormattedMessage id="create.org.title" defaultMessage="Create Organization" />
-            </H1>
-          </Box>
-        </Flex>
+    <Flex flexDirection="column" m={[2, 0]}>
+      <Flex flexDirection="column" my={[2, 4]}>
+        <Box textAlign="left" minHeight="32px" marginLeft={['none', 'none']}>
+          <BackButton asLink onClick={() => window && window.history.back()}>
+            ←&nbsp;
+            <FormattedMessage id="Back" defaultMessage="Back" />
+          </BackButton>
+        </Box>
+        <Box mb={[2, 3]}>
+          <H1
+            fontSize={['20px', '32px']}
+            lineHeight={['24px', '36px']}
+            fontWeight="bold"
+            textAlign="center"
+            color="black.900"
+          >
+            <FormattedMessage id="create.org.title" defaultMessage="Create Organization" />
+          </H1>
+        </Box>
       </Flex>
       {error && (
         <Flex alignItems="center" justifyContent="center">
@@ -170,7 +167,7 @@ function CreateOrganizationForm(props) {
                       name="name"
                       htmlFor="name"
                       error={touched.name && errors.name}
-                      label={intl.formatMessage(messages.nameLabel)}
+                      label={intl.formatMessage(orgMessages.nameLabel)}
                       value={values.name}
                       onChange={handleSlugChange}
                       required
@@ -208,27 +205,28 @@ function CreateOrganizationForm(props) {
                       <P fontSize="10px">{intl.formatMessage(messages.suggestedLabel)}</P>
                     )}
                     <StyledInputField
-                      name="description"
                       htmlFor="description"
                       error={touched.description && errors.description}
-                      label={intl.formatMessage(messages.descriptionLabel)}
+                      label={intl.formatMessage(orgMessages.descriptionLabel)}
                       required
                       mt={3}
                       data-cy="cof-org-description"
                     >
                       {inputProps => (
-                        <StyledTextarea
-                          {...inputProps}
-                          as={StyledInput}
-                          width="100%"
-                          minHeight={80}
+                        <Field
+                          as={StyledTextarea}
                           onChange={e => {
                             setFieldValue('description', e.target.value);
                           }}
+                          {...inputProps}
+                          name="description"
+                          minHeight={80}
+                          maxHeight={80}
                           minLength={5}
                           maxLength={150}
+                          width="100%"
                           value={values.description}
-                          placeholder={intl.formatMessage(placeholders.description)}
+                          placeholder={intl.formatMessage(messages.descriptionPlaceholder)}
                         />
                       )}
                     </StyledInputField>
@@ -237,7 +235,7 @@ function CreateOrganizationForm(props) {
                       name="website"
                       htmlFor="website"
                       error={touched.website && errors.website}
-                      label={intl.formatMessage(messages.websiteLabel)}
+                      label={intl.formatMessage(orgMessages.websiteLabel)}
                       value={values.website}
                       required
                       mt={3}
@@ -275,12 +273,6 @@ function CreateOrganizationForm(props) {
                         <StyledHr flex="1" borderStyle="solid" borderColor="black.300" width={[100, 110, 120]} />
                       </Flex>
                       <Flex data-cy="org-profile-card">
-                        <OnboardingProfileCard
-                          key={LoggedInUser.collective.id}
-                          collective={LoggedInUser.collective}
-                          adminCollective={LoggedInUser.collective}
-                          removeAdmin={removeAdmin}
-                        />
                         {admins.length > 0 && (
                           <Flex width="100%" flexWrap="wrap">
                             {admins.map(admin => (
@@ -328,7 +320,7 @@ function CreateOrganizationForm(props) {
                       />
                     }
                     onChange={({ checked }) => {
-                      setAuthorization({ authorization: checked });
+                      setAuthorization(checked);
                     }}
                   />
                   <Flex justifyContent={['center', 'left']} my={4}>
@@ -357,9 +349,19 @@ function CreateOrganizationForm(props) {
                               <FormattedMessage id="signinlink" defaultMessage="Sign in →" />
                             </StyledLink>
                           ),
-                          tos: <FormattedMessage color="black.800" id="tos.org" defaultMessage="Terms of Service" />,
+                          tos: (
+                            <FormattedMessage
+                              color="red.800"
+                              id="collective.tos.label"
+                              defaultMessage="Terms of Service"
+                            />
+                          ),
                           privacy: (
-                            <FormattedMessage color="black.600" id="privacy.org" defaultMessage="Privacy Policy" />
+                            <FormattedMessage
+                              color="black.200"
+                              id="company.privacyPolicy"
+                              defaultMessage="Privacy Policy"
+                            />
                           ),
                         }}
                       />
@@ -384,4 +386,4 @@ CreateOrganizationForm.propTypes = {
   updateAdmins: PropTypes.func,
   intl: PropTypes.object.isRequired,
 };
-export default injectIntl(withRouter(CreateOrganizationForm));
+export default injectIntl(withRouter(withUser(CreateOrganizationForm)));

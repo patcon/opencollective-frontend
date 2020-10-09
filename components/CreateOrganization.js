@@ -46,7 +46,7 @@ class CreateOrganization extends React.Component {
   async createCollective(collective) {
     if (!collective.authorization) {
       this.setState({
-        result: { error: 'Please verify that you are an authorized representaive of this organization' },
+        result: { error: 'Please verify that you are an authorized representative of this organization' },
       });
       return;
     }
@@ -128,7 +128,6 @@ class CreateOrganization extends React.Component {
                   onSubmit={this.createCollective}
                   onChange={this.resetError}
                   error={result.error}
-                  LoggedInUser={LoggedInUser}
                   updateAdmins={this.updateAdmins}
                 />
                 <Container
