@@ -524,7 +524,7 @@
   "createOrg.form.suggestedLabel": "Suggested",
   "createOrg.form.webstiteLabel": "What's your Organization's website",
   "createorganization.authorization.label": "I verify that I am an authorized representative of this organization and \n                            have the right to act on its behalf.",
-  "createOrganization.tos": "By joining, you agree to ourto <tos>Terms of Service</tos> and {privacy}.\n                          Already have an account?  {signinlink}",
+  "createOrganization.tos": "By joining, you agree to our {tos} and {privacy}.\n                          Already have an account?  {signinlink}",
   "createPledge.collectiveDetails": "新集体的细节：",
   "createPledge.conditions": "目前, 您只能使用 GitHub 存储库或组织为开源项目认捐。我们要求至少有一个Github储存库有100星!",
   "createPledge.faq.howToClaim": "You’ll need to contact <SupportLink></SupportLink> to proove that you are an admin of this project.",

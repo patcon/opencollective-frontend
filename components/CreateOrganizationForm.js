@@ -119,7 +119,7 @@ function CreateOrganizationForm(props) {
             fontSize="28px"
             lineHeight="36px"
             fontWeight="500"
-            textAlign={['left', 'left', 'left', 'center']}
+            textAlign={['left', 'center']}
             color="black.900"
             letterSpacing="1px"
             mt={1}

@@ -524,7 +524,7 @@
   "createOrg.form.suggestedLabel": "Suggested",
   "createOrg.form.webstiteLabel": "What's your Organization's website",
   "createorganization.authorization.label": "I verify that I am an authorized representative of this organization and \n                            have the right to act on its behalf.",
-  "createOrganization.tos": "By joining, you agree to ourto <tos>Terms of Service</tos> and {privacy}.\n                          Already have an account?  {signinlink}",
+  "createOrganization.tos": "By joining, you agree to our {tos} and {privacy}.\n                          Already have an account?  {signinlink}",
   "createPledge.collectiveDetails": "Detalles del nuevo colectivo:",
   "createPledge.conditions": "Por el momento, solo puedes prometer proyectos de Código Abierto con un repositorio u organización de GitHub. ¡Nosotros\n                pedimos al proyecto que tenga al menos 100 estrellas en GitHub!",
   "createPledge.faq.howToClaim": "You’ll need to contact <SupportLink></SupportLink> to proove that you are an admin of this project.",
