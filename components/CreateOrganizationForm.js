@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import themeGet from '@styled-system/theme-get';
 import { Field, Form, Formik } from 'formik';
 import { trim } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import slugify from 'slugify';
-import styled from 'styled-components';
 
+import { BackButton, messages } from './create-collective/CreateCollectiveForm';
 import OnboardingProfileCard from './onboarding-modal/OnboardingProfileCard';
 import CollectivePickerAsync from './CollectivePickerAsync';
-import { BackButton, messages } from './create-collective/CreateCollectiveForm';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import MessageBox from './MessageBox';
@@ -81,7 +79,7 @@ function CreateOrganizationForm(props) {
     if (values.description.length > 150) {
       errors.description = intl.formatMessage(messages.errorDescription);
     }
-    const regexExp = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+    const regexExp = /[-a-zA-Z0-9@:%._/+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_/+.~#?&//=]*)?/gi;
 
     if (!values.website.match(new RegExp(regexExp)) || values.website.startsWith('http')) {
       errors.website = intl.formatMessage(orgMessages.errorWebsite);
@@ -107,21 +105,24 @@ function CreateOrganizationForm(props) {
   }, [admins]);
 
   return (
-    <Flex flexDirection="column" m={[2, 0]}>
-      <Flex flexDirection="column" my={[2, 4]}>
-        <Box textAlign="left" minHeight="32px" marginLeft={['none', 'none']}>
+    <Flex flexDirection="column">
+      <Flex flexDirection="column" my={[0, 2]}>
+        <Box>
           <BackButton asLink onClick={() => window && window.history.back()}>
             ←&nbsp;
             <FormattedMessage id="Back" defaultMessage="Back" />
           </BackButton>
         </Box>
-        <Box mb={[2, 3]}>
+        <Box mb={[2, 3]} alignItems="center">
           <H1
-            fontSize={['20px', '32px']}
-            lineHeight={['24px', '36px']}
-            fontWeight="bold"
-            textAlign="center"
+            width={[288, 264]}
+            fontSize="28px"
+            lineHeight="36px"
+            fontWeight="500"
+            textAlign={['left', 'left', 'left', 'center']}
             color="black.900"
+            letterSpacing="1px"
+            mt={1}
           >
             <FormattedMessage id="create.org.title" defaultMessage="Create Organization" />
           </H1>
@@ -152,15 +153,15 @@ function CreateOrganizationForm(props) {
           };
           return (
             <Form>
-              <Container flexDirection="column" justifyContent="center" px={[1, 30, 150]}>
+              <Container flexDirection="column" justifyContent="center" px={[1, 30, 100]} mt={4}>
                 <Container display="flex" flexDirection={['column', 'row', 'row']}>
                   <Flex
                     flexDirection="column"
-                    mx={[1, 10, 15]}
-                    width={[320, 350, 376, 476]}
+                    mx={[1, 10, 10]}
+                    width={[320, 350, 376, 472]}
                     justifyContent="space-around"
                   >
-                    <H4>
+                    <H4 color="black.900" fontSize="28px">
                       <FormattedMessage id="organization.info.headline" defaultMessage="Organization's information" />
                     </H4>
                     <StyledInputField
@@ -168,10 +169,13 @@ function CreateOrganizationForm(props) {
                       htmlFor="name"
                       error={touched.name && errors.name}
                       label={intl.formatMessage(orgMessages.nameLabel)}
+                      labelFontSize="13px"
+                      labelColor="black.700"
+                      fontSize="18px"
                       value={values.name}
                       onChange={handleSlugChange}
                       required
-                      mt={4}
+                      mt={3}
                       mb={3}
                       data-cy="cof-form-name"
                     >
@@ -184,6 +188,9 @@ function CreateOrganizationForm(props) {
                       htmlFor="slug"
                       error={touched.slug && errors.slug}
                       label={intl.formatMessage(messages.slugLabel)}
+                      labelFontSize="13px"
+                      labelColor="black.700"
+                      fontSize="19px"
                       value={values.slug}
                       required
                       mt={3}
@@ -202,12 +209,15 @@ function CreateOrganizationForm(props) {
                       )}
                     </StyledInputField>
                     {values.name.length > 0 && !touched.slug && (
-                      <P fontSize="10px">{intl.formatMessage(messages.suggestedLabel)}</P>
+                      <P fontSize="11px">{intl.formatMessage(messages.suggestedLabel)}</P>
                     )}
                     <StyledInputField
                       htmlFor="description"
                       error={touched.description && errors.description}
                       label={intl.formatMessage(orgMessages.descriptionLabel)}
+                      labelFontSize="13px"
+                      labelColor="black.700"
+                      fontSize="13px"
                       required
                       mt={3}
                       data-cy="cof-org-description"
@@ -236,6 +246,8 @@ function CreateOrganizationForm(props) {
                       htmlFor="website"
                       error={touched.website && errors.website}
                       label={intl.formatMessage(orgMessages.websiteLabel)}
+                      labelFontSize="13px"
+                      labelColor="black.700"
                       value={values.website}
                       required
                       mt={3}
@@ -247,6 +259,7 @@ function CreateOrganizationForm(props) {
                           onChange={e => {
                             setFieldValue('website', e.target.value);
                           }}
+                          color="red.400"
                           as={StyledInputGroup}
                           {...inputProps}
                           prepend="http://"
@@ -255,24 +268,24 @@ function CreateOrganizationForm(props) {
                       )}
                     </StyledInputField>
                   </Flex>
-                  <Flex flexDirection="column" width={[320, 350, 376, 476]} mx={[1, 10, 15]}>
-                    <H4>
+                  <Flex flexDirection="column" width={[320, 350, 376, 472]} mx={[1, 10, 20]}>
+                    <H4 color="black.900">
                       <FormattedMessage id="organization.coadmins.headline" defaultMessage="Administrators" />
                     </H4>
-                    <P fontSize="14px" mb={2} lineHeight={2}>
+                    <P fontSize="14px" mb={2} lineHeight={2} color="black.700">
                       <FormattedMessage
                         id="coAdminsDescription"
                         defaultMessage="Organization admins can make changes in the profile and interact with other profiles on behalf of this organization."
                       />
                     </P>
-                    <Container border="1px solid #E6E8EB" borderRadius="8px" p={[2, 3]} height="auto">
-                      <Flex flexDirection="row" alignItems="center" justifyContent="space-around">
-                        <Flex fontSize="10px" mr={2}>
+                    <Container border="1px solid #E6E8EB" borderRadius="16px" p={3} height="auto">
+                      <Flex flexDirection="row" alignItems="center" justifyContent="space-between">
+                        <Flex fontSize="9px" mr={2} color="black.700" fontWeight="500">
                           <FormattedMessage id="inviteAdmin" defaultMessage="INVITE CO-ADMIN" />
                         </Flex>
                         <StyledHr flex="1" borderStyle="solid" borderColor="black.300" width={[100, 110, 120]} />
                       </Flex>
-                      <Flex data-cy="org-profile-card">
+                      <Flex data-cy="org-profile-card" mt={2}>
                         {admins.length > 0 && (
                           <Flex width="100%" flexWrap="wrap">
                             {admins.map(admin => (
@@ -287,12 +300,13 @@ function CreateOrganizationForm(props) {
                         )}
                       </Flex>
                       <Flex flexDirection="row" alignItems="center" justifyContent="space-around" mt={4}>
-                        <Flex fontSize="10px" mr={2}>
+                        <Flex fontSize="9px" mr={2} color="black.700" fontWeight="500">
                           <FormattedMessage id="inviteAdmin" defaultMessage="INVITE CO-ADMIN" />
                         </Flex>
                         <StyledHr flex="1" borderStyle="solid" borderColor="black.300" width={[100, 110, 120]} />
                       </Flex>
                       <CollectivePickerAsync
+                        mt={2}
                         creatable
                         collective={null}
                         types={['USER']}
@@ -312,6 +326,7 @@ function CreateOrganizationForm(props) {
                   <StyledCheckbox
                     name="authorization"
                     required
+                    fontSize="12px"
                     label={
                       <FormattedMessage
                         id="createorganization.authorization.label"
@@ -337,35 +352,38 @@ function CreateOrganizationForm(props) {
                       <FormattedMessage id="organization.create.button" defaultMessage="Create Organization" />
                     </StyledButton>
                   </Flex>
-                  <Box textAlign="left" minHeight="24px">
-                    <P fontSize="16px" mb={2}>
-                      <FormattedMessage
-                        id="createOrganization.tos"
-                        defaultMessage="By joining, you agree to our {tos} and {privacy}.
+
+                  <Box textAlign="left" fontSize="12px" minHeight="24px" color="black.500">
+                    <FormattedMessage
+                      id="createOrganization.tos"
+                      defaultMessage="By joining, you agree to our {tos} and {privacy}.
                           Already have an account?  {signinlink}"
-                        values={{
-                          signinlink: (
-                            <StyledLink href={''} openInNewTab>
-                              <FormattedMessage id="signinlink" defaultMessage="Sign in →" />
-                            </StyledLink>
-                          ),
-                          tos: (
+                      values={{
+                        signinlink: (
+                          <StyledLink href="/signin" openInNewTab>
+                            <FormattedMessage id="signinlink" defaultMessage="Sign in →" />
+                          </StyledLink>
+                        ),
+                        tos: (
+                          <strong>
                             <FormattedMessage
-                              color="red.800"
+                              color="black.800"
                               id="collective.tos.label"
                               defaultMessage="Terms of Service"
                             />
-                          ),
-                          privacy: (
+                          </strong>
+                        ),
+                        privacy: (
+                          <strong>
                             <FormattedMessage
-                              color="black.200"
+                              color="black.800"
                               id="company.privacyPolicy"
                               defaultMessage="Privacy Policy"
                             />
-                          ),
-                        }}
-                      />
-                    </P>
+                          </strong>
+                        ),
+                      }}
+                    />
                   </Box>
                 </Flex>
               </Container>
